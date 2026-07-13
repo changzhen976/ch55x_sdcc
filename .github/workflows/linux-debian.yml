@@ -1,0 +1,38 @@
+name: Linux build (Debian trixie / SDCC 4.5.0)
+
+on:
+  push:
+    branches:
+      - master
+      - github_actions
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - master
+      - github_actions
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+
+    steps:
+    - name: Check out
+      uses: actions/checkout@v4
+
+    - name: Install SDCC
+      run: apt-get update && apt-get install -y --no-install-recommends sdcc build-essential
+
+    - name: Build examples
+      run: make
+      working-directory: examples
+
+    - name: Upload firmware artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware-debian-trixie
+        path: |
+          examples/**/*.bin
+          examples/**/*.hex
+        if-no-files-found: warn

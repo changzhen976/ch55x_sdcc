@@ -1,0 +1,37 @@
+name: Linux build (Ubuntu 24.04 / SDCC 4.2.0)
+
+on:
+  push:
+    branches:
+      - master
+      - github_actions
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - master
+      - github_actions
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Check out
+      uses: actions/checkout@v4
+
+    - name: Install SDCC
+      run: sudo apt-get update && sudo apt-get install -y sdcc
+
+    - name: Build examples
+      run: make
+      working-directory: examples
+
+    - name: Upload firmware artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware-ubuntu-2404
+        path: |
+          examples/**/*.bin
+          examples/**/*.hex
+        if-no-files-found: warn
